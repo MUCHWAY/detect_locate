@@ -56,7 +56,7 @@ class Watchdog():
         self.isFeed=True
 
 class Detect_Grtk():
-    def __init__(self,ID,data_save_path):
+    def __init__(self,ID,data_save_path,camera_mtx):
 
         self.uav_pos = [0.00,0.00,0.00]
         self.uav_attitude = [0.00,0.00,0.00]
@@ -83,7 +83,7 @@ class Detect_Grtk():
         self.uav_rtk_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
         self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
 
-        self.cam_pos = Camera_pos()
+        self.cam_pos = Camera_pos(camera_mtx)
 
     def getJsonData(self):
         if len(self.targets)>0:
@@ -129,7 +129,7 @@ class Detect_Grtk():
                 detect_w = data.size_x[i]
                 detect_h = data.size_y[i]
 
-                pix=self.cam_pos.pf.getFixednew_det(detect_x,detect_y,detect_w,detect_h,camera_pose[4])     #修正斜视偏差
+                pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,camera_pose[4])     #修正斜视偏差
                 self.new_det=self.cam_pos.point2point(pix)
                 self.cam_to_world=self.cam_pos.new_det2pos_2(camera_pose,self.cam_pos.mtx,self.new_det,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
 
@@ -163,9 +163,10 @@ class Detect_Grtk():
 if __name__ == "__main__":
     rospy.init_node("locate_node", anonymous=True)
     ID = rospy.get_param('~ID')
+    camera_mtx = rospy.get_param('~camera_mtx')
     data_save_path = rospy.get_param('~data_save_path')
 
-    detect_grtk=Detect_Grtk(ID, data_save_path)
+    detect_grtk=Detect_Grtk(ID, data_save_path, camera_mtx)
     detect_grtk.sub()
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

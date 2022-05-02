@@ -1,0 +1,9 @@
+<launch>
+    <group ns="uav1">
+        <node pkg="camera_locate" type="locate_fly.py" name="locate_node" output="screen">
+            <param name="ID" value = "1"/>
+            <param name="camera_mtx" value = "4k"/>	
+            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+        </node>
+    </group>
+</launch>

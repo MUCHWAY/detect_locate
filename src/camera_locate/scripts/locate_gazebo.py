@@ -58,7 +58,7 @@ class Watchdog():
         self.isFeed=True
 
 class Detect_Grtk():
-    def __init__(self,ID):
+    def __init__(self,ID,camera_mtx):
         self.uav_attitude = [0.00,0.00,0.00]
         self.uav_pos = [0.00,0.00,0.00]
         self.cam_to_world = [0.00, 0.00 ,0.00]
@@ -82,7 +82,7 @@ class Detect_Grtk():
         self.uav_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
         self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
 
-        self.cam_pos = Camera_pos()
+        self.cam_pos = Camera_pos(camera_mtx)
 
     def getJsonData(self):
         if len(self.targets)>0:
@@ -150,9 +150,10 @@ class Detect_Grtk():
 if __name__ == "__main__":
     rospy.init_node("locate_node", anonymous=True)
     ID = rospy.get_param('~ID')
+    camera_mtx = rospy.get_param('~camera_mtx')
     data_save_path = rospy.get_param('~data_save_path')
 
-    detect_grtk=Detect_Grtk(ID)
+    detect_grtk=Detect_Grtk(ID,camera_mtx)
     detect_grtk.sub()
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -20,8 +20,6 @@ from grtk.msg import GNGGA
 
 from cam_pos import *
 
-print('test')
-
 class DelayedQueue:
     datas=[]
     delay=None

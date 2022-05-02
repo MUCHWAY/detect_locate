@@ -10,7 +10,6 @@ import datetime
 import socket
 from time import sleep,time
 import json
-
 from std_msgs.msg import *
 from geometry_msgs.msg import *
 from nav_msgs.msg import *
@@ -20,6 +19,8 @@ from yolov5_detect.msg import detect
 from grtk.msg import GNGGA
 
 from cam_pos import *
+
+print('test')
 
 class DelayedQueue:
     datas=[]

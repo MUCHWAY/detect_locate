@@ -59,6 +59,10 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msg</exec_depend>
 
+  <exec_depend>yolov5_detect</exec_depend>
+  <build_export_depend>yolov5_detect</build_export_depend>
+  <build_depend>yolov5_detect</build_depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

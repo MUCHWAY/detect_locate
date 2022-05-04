@@ -1,0 +1,34 @@
+<launch>
+    <arg name="engine_name" default="$(find yolov5_detect)/weights/gazebo_1024_s_nx.engine"/>
+    <arg name="video_name" default="$(find yolov5_detect)/detect/test_vedio/DJI_0668-4k.MP4"/>
+    <arg name="img_topic" default="prometheus/sensor/monocular_down/image_raw"/>
+    <arg name="video_out_path" default="$(find yolov5_detect)/detect/"/>
+    <arg name="sort_p" default="2"/>
+
+    <group ns="uav5">
+        <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
+            <param name="node_num" type = "string" value = "uav1"/>
+            <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
+            <param name="video_name" type = "string" value = "$(arg video_name)"/> 
+            <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
+            <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
+            <param name="video_out_path" type = "string" value = "$(arg video_out_path)"/> 
+            <param name="sort_p" type = "int" value = "$(arg sort_p)"/> 
+        </node>
+    </group>
+
+    <group ns="uav6">
+        <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
+            <param name="node_num" type = "string" value = "uav2"/>
+            <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
+            <param name="video_name" type = "string" value = "$(arg video_name)"/> 
+            <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
+            <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
+            <param name="video_out_path" type = "string" value = "$(arg video_out_path)"/> 
+            <param name="sort_p" type = "int" value = "$(arg sort_p)"/> 
+        </node>
+    </group>
+    
+</launch>
+
+

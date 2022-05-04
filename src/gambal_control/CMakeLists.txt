@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  yolov5_detect
+  OpenCV
 )
 
 
@@ -29,10 +31,11 @@ CATKIN_DEPENDS
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
-find_package(OpenCV)
-include_directories(${OpenCV_INCLUDE_DIRS})
+# find_package(OpenCV)
+# include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(gambal_control  src/control.cpp src/ClientSocket.cpp src/Socket.cpp)
 add_dependencies(gambal_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

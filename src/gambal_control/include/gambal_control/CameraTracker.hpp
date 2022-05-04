@@ -1,18 +1,18 @@
 #ifndef CAMERA_TRACKER_HPP_
 #define CAMERA_TRACKER_HPP_
 
-#include "gambal_control/TcpSerial.hpp.hpp"
+#include "gambal_control/TcpSerial.hpp"
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
 
 #define CONTROL_INTERVAL 0.05
 
-#define K_P 0.20
+#define K_P 0.10
 #define K_I 0.01
 #define K_D 0.01
 
-#define MAX_SPEED 40
+#define MAX_SPEED 20
 #define MIN_ERROR 10
 
 class CameraTracker
@@ -45,10 +45,17 @@ public:
         this->isStart=isStart;
     }
 
-    void updateError(int dx,int dy)
+    void updateError(int dx,int dy,bool isReset=false)
     {
         this->dx=dx;
         this->dy=dy;
+        if(isReset)
+        {
+            x_sum=0;
+            x_pre=dx;
+            y_sum=0;
+            y_pre=dy;
+        }
     }
 
 private:

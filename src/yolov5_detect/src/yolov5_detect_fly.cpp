@@ -76,14 +76,11 @@ int main(int argc, char** argv) {
     string video_out_path;
     ros::param::get("~video_out_path", video_out_path);
 
-    string img_topic;
-    ros::param::get("~img_topic", img_topic);
+    int sort_p;
+    ros::param::get("~sort_p", sort_p);
 
-    Ros_image ros_img(img_topic);
     Img_update img_update(video_name);
-
     thread img_update_thread(&Img_update::update, &img_update);//图像来自于相机
-    // thread ros_img_thread(&Ros_image::img_update, &ros_img); //图像来自于话题
 
     cudaSetDevice(DEVICE);
 
@@ -166,17 +163,6 @@ int main(int argc, char** argv) {
 
         if(img_update.img_flag==0) break;
         raw_img=img_update.get_img();
-
-        // if(ros_img.update < 20) {
-        //     raw_img = ros_img.img.clone();
-        //     ros_img.update ++;
-        //     if(ros_img.update > 30) ros_img.update = 30;
-        // }
-        // else {
-        //     cout<<"Image not updated!!!"<<endl;
-        //     usleep(1000 * 50);
-        //     continue;
-        // }
         
         memset(result_sum, 0, sizeof(result_sum));
         sum_index=1;
@@ -225,8 +211,8 @@ int main(int argc, char** argv) {
             for (size_t m = 0 ; m < final_res.size(); m++) {
                 dr.target_location.x = (unsigned int)final_res[m].bbox[0];
                 dr.target_location.y = (unsigned int)final_res[m].bbox[1];
-                dr.target_location.width = (int)final_res[m].bbox[2];
-                dr.target_location.height = (int)final_res[m].bbox[3];
+                dr.target_location.width = (int)final_res[m].bbox[2]  * sort_p;
+                dr.target_location.height = (int)final_res[m].bbox[3]  * sort_p;
                 dr.target_location_confidence = final_res[m].conf;
                 dr.target_name = class_[(int)final_res[m].class_id];
                 detect_result.push_back(dr);
@@ -241,13 +227,13 @@ int main(int argc, char** argv) {
                 // cout<<t.id<<endl;
                 // cout<<t.target_name<<endl;
 
-                detect_msg.num.push_back((int8_t)t.id);
+                detect_msg.num.push_back(t.id);
                 detect_msg.class_name.push_back(t.target_name);
                 detect_msg.conf.push_back((int8_t)(t.confidence*100));
                 detect_msg.box_x.push_back((int16_t)t.box.x); 
                 detect_msg.box_y.push_back((int16_t)t.box.y);
-                detect_msg.size_x.push_back((int16_t)t.box.width);
-                detect_msg.size_y.push_back((int16_t)t.box.height);
+                detect_msg.size_x.push_back((int16_t)t.box.width  / sort_p);
+                detect_msg.size_y.push_back((int16_t)t.box.height  / sort_p);
 
                 // 在图上画出跟踪结果
                 // if(t.confidence != 0) {

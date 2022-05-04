@@ -85,8 +85,8 @@ int main(int argc, char** argv) {
     Ros_image ros_img(img_topic);
     thread ros_img_thread(&Ros_image::img_update, &ros_img); //图像来自于话题
 
-    Img_update img_update(video_name);
-    thread img_update_thread(&Img_update::update, &img_update);//图像来自于相机
+    // Img_update img_update(video_name);
+    // thread img_update_thread(&Img_update::update, &img_update);//图像来自于相机
     
     cudaSetDevice(DEVICE);
 

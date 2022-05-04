@@ -5,7 +5,7 @@
     <arg name="video_out_path" default="$(find yolov5_detect)/detect/"/>
     <arg name="sort_p" default="2"/>
 
-    <group ns="uav5">
+    <group ns="uav1">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
             <param name="node_num" type = "string" value = "uav1"/>
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
@@ -17,7 +17,7 @@
         </node>
     </group>
 
-    <group ns="uav6">
+    <group ns="uav2">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
             <param name="node_num" type = "string" value = "uav2"/>
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	

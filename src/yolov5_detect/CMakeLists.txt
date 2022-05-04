@@ -7,6 +7,9 @@ project(yolov5_detect)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+# set(OpenCV_DIR /usr/lib/aarch64-linux-gnu/cmake/opencv4/)
+
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   message_generation

@@ -24,8 +24,6 @@ CATKIN_DEPENDS
 #  DEPENDS system_lib
 )
 
-
-
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
@@ -39,5 +37,5 @@ include_directories(
 
 add_executable(gambal_control  src/control.cpp src/ClientSocket.cpp src/Socket.cpp)
 add_dependencies(gambal_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gambal_control ${OpenCV_LIBS})
+target_link_libraries(gambal_control ${OpenCV_LIBS} ${catkin_LIBRARIES})
 

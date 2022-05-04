@@ -7,7 +7,7 @@
 
     <group ns="uav7">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
-            <param name="node_num" type = "string" value = "uav1"/>
+            <param name="node_num" type = "string" value = "uav7"/>
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
             <param name="video_name" type = "string" value = "$(arg video_name)"/> 
             <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
@@ -19,7 +19,7 @@
 
     <group ns="uav8">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
-            <param name="node_num" type = "string" value = "uav2"/>
+            <param name="node_num" type = "string" value = "uav8"/>
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
             <param name="video_name" type = "string" value = "$(arg video_name)"/> 
             <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 

@@ -130,6 +130,7 @@ private:
     {
         long interval=(long)(CONTROL_INTERVAL*1000000);
         clock_t tick=clock(),tock;
+        
         while(!isEnding)
         {
             while(isStart)

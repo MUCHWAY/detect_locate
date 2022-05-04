@@ -22,7 +22,6 @@
 #include <mutex>
 #include <vector>
 #include <ros/ros.h>
-using namespace std;
 
 using namespace std;
 using namespace cv;

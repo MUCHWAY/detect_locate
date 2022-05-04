@@ -5,7 +5,7 @@
 #include "gambal_control/ClientSocket.h"
 #include "gambal_control/SocketException.h"
 
-#define TCP_SERIAL_IP "192.168.42.200"
+#define TCP_SERIAL_IP "192.168.42.109"
 
 #define TCP_SERIAL_MSG_SIZE 24
 #define CAN_MESSAGE_SIZE 8

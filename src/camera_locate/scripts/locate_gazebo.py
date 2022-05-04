@@ -93,9 +93,9 @@ class Detect_Grtk():
                 'targets':[]}).encode('utf-8')
 
     def sub(self):
-        rospy.Subscriber(self.id + "/yolov5_detect_node/detect", detect , self.yolov5_sub)
-        rospy.Subscriber(self.id + "/prometheus/drone_state", DroneState , self.uav_attitude_sub)
-        rospy.Subscriber(self.id + "/mavros/local_position/pose", PoseStamped , self.local_pose_sub)
+        rospy.Subscriber('/'+self.id + "/yolov5_detect_node/detect", detect , self.yolov5_sub)
+        rospy.Subscriber('/'+self.id + "/prometheus/drone_state", DroneState , self.uav_attitude_sub)
+        rospy.Subscriber('/'+self.id + "/mavros/local_position/pose", PoseStamped , self.local_pose_sub)
 
     def local_pose_sub(self,msg):
         # self.uav_pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
@@ -141,6 +141,7 @@ class Detect_Grtk():
             self.watchdog.feed()
 
     def save_send(self):
+        print(self.id)
         print("{0:>8} {1:>6} {2:>6}".format("det_uv:",int(self.new_det[0]), int(self.new_det[1])))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_att:", round(self.uav_attitude[0], 2), round(self.uav_attitude[1], 2), round(self.uav_attitude[2], 2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_pos:",round(self.uav_pos[0],2),round(self.uav_pos[1],2),round(self.uav_pos[2],2)))

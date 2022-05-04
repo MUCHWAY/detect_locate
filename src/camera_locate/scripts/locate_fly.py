@@ -16,6 +16,7 @@ from nav_msgs.msg import *
 from sensor_msgs.msg import *
 
 from yolov5_detect.msg import detect
+from camera_locate.msg import DroneState
 from grtk.msg import GNGGA
 
 from cam_pos import *
@@ -56,7 +57,7 @@ class Watchdog():
         self.isFeed=True
 
 class Detect_Grtk():
-    def __init__(self,ID,data_save_path,camera_mtx):
+    def __init__(self,ID, camera_mtx, camera_dist, resolution):
 
         self.uav_pos = [0.00,0.00,0.00]
         self.uav_attitude = [0.00,0.00,0.00]
@@ -79,11 +80,11 @@ class Detect_Grtk():
 
         self.watchdog = Watchdog(callback=clean)
 
-        self.uav_gps_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=100) )
+        self.uav_gps_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=100) )
         self.uav_rtk_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
         self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
 
-        self.cam_pos = Camera_pos(camera_mtx)
+        self.cam_pos = Camera_pos(camera_mtx, camera_dist, resolution)
 
     def getJsonData(self):
         if len(self.targets)>0:
@@ -95,6 +96,7 @@ class Detect_Grtk():
 
     def sub(self):
         rospy.Subscriber("/yolov5_detect_node/detect", detect , self.yolov5_sub)
+        rospy.Subscriber("/prometheus/drone_state", DroneState , self.uav_attitude_sub)
         rospy.Subscriber("/mavros/local_position/pose", PoseStamped , self.uav_gps_sub)
         rospy.Subscriber("/uav_rtk", GNGGA , self.uav_rtk_sub)
 
@@ -105,6 +107,11 @@ class Detect_Grtk():
         
     def uav_rtk_sub(self, msg):
         self.uav_rtk_pos_queue.push(self.caculate(self.uav_rtk_home, [msg.lat, msg.lon, msg.alt]))
+    
+    def uav_attitude_sub(self,msg):
+        # print(msg)
+        # self.uav_attitude=[msg.attitude[0]*57.3, msg.attitude[1]*57.3, ((-1 * msg.attitude[2]*57.3) + 90 + 360) % 360]
+        self.uav_attitude_queue.push([msg.attitude[0]*57.3, msg.attitude[1]*57.3, ((-1 * msg.attitude[2]*57.3) + 90 + 360) % 360])
 
     def yolov5_sub(self,data):
         if data:
@@ -115,7 +122,7 @@ class Detect_Grtk():
             
             if self.uav_rtk_pos_queue.datas:
                 self.uav_pos = self.uav_rtk_pos_queue.datas[0][1]
-
+            
             if self.uav_attitude_queue.datas:
                 self.uav_attitude = self.uav_attitude_queue.datas[0][1]
 
@@ -130,9 +137,10 @@ class Detect_Grtk():
                 detect_h = data.size_y[i]
 
                 pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,camera_pose[4])     #修正斜视偏差
-                self.new_det=self.cam_pos.point2point(pix)
-                self.cam_to_world=self.cam_pos.new_det2pos_2(camera_pose,self.cam_pos.mtx,self.new_det,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
+                pix=self.cam_pos.point2point(pix)
+                self.cam_to_world=self.cam_pos.pix2pos_2(camera_pose,self.cam_pos.mtx,pix,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
 
+                self.new_det=pix
                 targets.append({'id':int(data.num[i]),'x':self.cam_to_world[0],'y':self.cam_to_world[1]})
 
             self.camera_pose=camera_pose
@@ -163,10 +171,13 @@ class Detect_Grtk():
 if __name__ == "__main__":
     rospy.init_node("locate_node", anonymous=True)
     ID = rospy.get_param('~ID')
-    camera_mtx = rospy.get_param('~camera_mtx')
-    data_save_path = rospy.get_param('~data_save_path')
 
-    detect_grtk=Detect_Grtk(ID, data_save_path, camera_mtx)
+    calibrations_dict = rospy.get_param('~calibration')
+    camera_mtx = calibrations_dict[ID]['camera_mtx']
+    camera_dist = calibrations_dict[ID]['camera_dist']
+    resolution = calibrations_dict[ID]['resolution']
+
+    detect_grtk=Detect_Grtk(ID, camera_mtx, camera_dist, resolution)
     detect_grtk.sub()
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -178,5 +189,5 @@ if __name__ == "__main__":
         data=detect_grtk.getJsonData()
         udp_socket.sendto(data, dest_addr_fusion)
         sleep(0.2)
-    detect_grtk.udp_socket.close()
+    udp_socket.close()
 

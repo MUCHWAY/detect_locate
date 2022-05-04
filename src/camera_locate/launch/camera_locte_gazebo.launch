@@ -1,16 +1,16 @@
 <launch>
     <group ns="uav1">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
-            <param name="ID" value = "1"/>	
-            <param name="camera_mtx" value = "1080"/>	
+            <param name="ID" value = "uav1"/>	
+            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
             <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
         </node>
     </group>
 
     <group ns="uav2">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
-            <param name="ID" value = "2"/>	
-            <param name="camera_mtx" value = "1080"/>	
+            <param name="ID" value = "uav2"/>	
+            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
             <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
         </node>
     </group>

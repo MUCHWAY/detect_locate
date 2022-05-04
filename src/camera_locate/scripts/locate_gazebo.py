@@ -58,7 +58,7 @@ class Watchdog():
         self.isFeed=True
 
 class Detect_Grtk():
-    def __init__(self,ID,camera_mtx):
+    def __init__(self,ID, camera_mtx, camera_dist, resolution):
         self.uav_attitude = [0.00,0.00,0.00]
         self.uav_pos = [0.00,0.00,0.00]
         self.cam_to_world = [0.00, 0.00 ,0.00]
@@ -82,7 +82,7 @@ class Detect_Grtk():
         self.uav_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
         self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
 
-        self.cam_pos = Camera_pos(camera_mtx)
+        self.cam_pos = Camera_pos( camera_mtx, camera_dist, resolution)
 
     def getJsonData(self):
         if len(self.targets)>0:
@@ -93,9 +93,9 @@ class Detect_Grtk():
                 'targets':[]}).encode('utf-8')
 
     def sub(self):
-        rospy.Subscriber("/uav"+ str(self.id) + "/yolov5_detect_node/detect", detect , self.yolov5_sub)
-        rospy.Subscriber("/uav"+ str(self.id) + "/prometheus/drone_state", DroneState , self.uav_attitude_sub)
-        rospy.Subscriber("/uav"+ str(self.id) + "/mavros/local_position/pose", PoseStamped , self.local_pose_sub)
+        rospy.Subscriber(self.id + "/yolov5_detect_node/detect", detect , self.yolov5_sub)
+        rospy.Subscriber(self.id + "/prometheus/drone_state", DroneState , self.uav_attitude_sub)
+        rospy.Subscriber(self.id + "/mavros/local_position/pose", PoseStamped , self.local_pose_sub)
 
     def local_pose_sub(self,msg):
         # self.uav_pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
@@ -150,10 +150,13 @@ class Detect_Grtk():
 if __name__ == "__main__":
     rospy.init_node("locate_node", anonymous=True)
     ID = rospy.get_param('~ID')
-    camera_mtx = rospy.get_param('~camera_mtx')
-    data_save_path = rospy.get_param('~data_save_path')
 
-    detect_grtk=Detect_Grtk(ID,camera_mtx)
+    calibrations_dict = rospy.get_param('~calibration')
+    camera_mtx = calibrations_dict[ID]['camera_mtx']
+    camera_dist = calibrations_dict[ID]['camera_dist']
+    resolution = calibrations_dict[ID]['resolution']
+
+    detect_grtk=Detect_Grtk(ID, camera_mtx, camera_dist, resolution)
     detect_grtk.sub()
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -165,5 +168,5 @@ if __name__ == "__main__":
         data=detect_grtk.getJsonData()
         udp_socket.sendto(data, dest_addr_fusion)
         sleep(0.2)
-    detect_grtk.udp_socket.close()
+    udp_socket.close()
 

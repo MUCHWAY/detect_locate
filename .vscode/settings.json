@@ -64,17 +64,11 @@
         "hash_set": "cpp"
     },
     "python.autoComplete.extraPaths": [
-        "/home/nvidia/Develop_Project/vsarm_ws/devel/lib/python3/dist-packages",
-        "/home/nvidia/Develop_Project/UWB/devel/lib/python2.7/dist-packages",
-        "/home/nvidia/Develop_Project/APM_WS/devel/lib/python2.7/dist-packages",
         "/opt/ros/melodic/lib/python2.7/dist-packages",
         "/usr/local/lib",
         "/usr/local/lib/python3.6/pyrealsense2"
     ],
     "python.analysis.extraPaths": [
-        "/home/nvidia/Develop_Project/vsarm_ws/devel/lib/python3/dist-packages",
-        "/home/nvidia/Develop_Project/UWB/devel/lib/python2.7/dist-packages",
-        "/home/nvidia/Develop_Project/APM_WS/devel/lib/python2.7/dist-packages",
         "/opt/ros/melodic/lib/python2.7/dist-packages",
         "/usr/local/lib",
         "/usr/local/lib/python3.6/pyrealsense2"

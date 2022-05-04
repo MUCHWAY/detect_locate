@@ -44,7 +44,8 @@ class pixFixer:
         if c<0:
             c=0
         elif c>=len(self.ANGLE_LUT):
-            c=len(self.ANGLE_LUT)
+            c=len(self.ANGLE_LUT)-1
+            
         pitch=-int(pitch+self.ANGLE_LUT[c])
         hw_ratio=h/w
         if pitch<=0:
@@ -58,27 +59,14 @@ class pixFixer:
             return [x+w/2,y+self.RATIO_LUT[pitch][-1]*h]
 
 class Camera_pos:
-    def __init__(self,cmera_mtx):
+    def __init__(self, camera_mtx, camera_dist, resolution):
         # 内参矩阵:
-
-        if(cmera_mtx == '1080'):
-            # 1920*1080 FOV=30
-            self.mtx = np.array([[35323049540000000, 0.000000000000000, 998.9751380000000],
-                                [0.000000000000000, 35320963130000000, 524.9486570000000],
-                                [0.000000000000000, 0.000000000000000, 1.000000000000000]])
-            self.dist = np.array([[0.00, 0.00, 0.00, 0.00, 0]])
-        elif (cmera_mtx == '1024'):
-            # 1024*1024 FOV=60
-            self.mtx = np.array([[886.6292067272493, 0.000000000000000, 511.6759266231074],
-                                 [0.000000000000000, 886.6393568235922, 511.7946062444309],
-                                 [0.000000000000000, 0.000000000000000, 1.000000000000000]])
-            self.dist = np.array([[0.00, 0.00, 0.00, 0.00, 0]])
-        else:
-            # 4016*2160 FOV=60
-            self.mtx = np.array([[3326.701550, 0.000000000, 1917.775908],
-                                 [0.000000000, 3326.882329, 1080.536339],
-                                 [0.000000000, 0.000000000, 1.000000000]])
-            self.dist = np.array([[0.00, 0.00, 0.00, 0.00, 0]])
+        self.mtx = np.array([[camera_mtx[0], 0.00000000000, camera_mtx[2]],
+                            [0.000000000000, camera_mtx[1], camera_mtx[3]],
+                            [0.000000000000, 0.00000000000, 1.0000000000]])
+        self.dist = np.array([[camera_dist[0], camera_dist[1], camera_dist[2], camera_dist[3], camera_dist[4]]])
+        self.FOV_v = 2 * np.arctan(self.mtx[1,2]/self.mtx[1,1])*57.3
+        self.size = resolution
 
         self.inv_mtx=np.linalg.inv(self.mtx)
 
@@ -88,7 +76,8 @@ class Camera_pos:
         
         self.camera_pos = [0.00 , 0.00 ,0.00]
         self.line_distance=0
-        self.pf=pixFixer()
+        
+        self.pf=pixFixer(img_height=self.size[1], FOV_v=self.FOV_v)
 
     def point2point(self,detect):
         a = []

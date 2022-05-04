@@ -2,7 +2,7 @@
     <group ns="uav1">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
             <param name="node_num" type = "string" value = "uav1"/>
-            <param name="engine_name" type = "string" value = "$(find yolov5_detect)/weights/gazebo_1024_s_agx.engine"/>	
+            <param name="engine_name" type = "string" value = "$(find yolov5_detect)/weights/gazebo_1024_s_nx.engine"/>	
             <param name="video_name" type = "string" value = "$(find yolov5_detect)/detect/test_vedio/DJI_0668-4k.MP4"/> 
             <param name="img_topic" type = "string" value = "prometheus/sensor/monocular_down/image_raw"/> 
             <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
@@ -15,7 +15,7 @@
     <group ns="uav2">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
             <param name="node_num" type = "string" value = "uav2"/>
-            <param name="engine_name" type = "string" value = "$(find yolov5_detect)/weights/gazebo_1024_s_agx.engine"/>	
+            <param name="engine_name" type = "string" value = "$(find yolov5_detect)/weights/gazebo_1024_s_nx.engine"/>	
             <param name="video_name" type = "string" value = "$(find yolov5_detect)/detect/test_vedio/DJI_0668-4k.MP4"/> 
             <param name="img_topic" type = "string" value = "prometheus/sensor/monocular_down/image_raw"/> 
             <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
@@ -24,7 +24,7 @@
         </node>
     </group>
 
-    <group ns="uav3">
+    <!-- <group ns="uav3">
         <node pkg="yolov5_detect" type="yolov5_detect_gazebo" name="yolov5_detect_node" output="screen">
             <param name="node_num" type = "string" value = "uav3"/>
             <param name="engine_name" type = "string" value = "$(find yolov5_detect)/weights/gazebo_1024_s_agx.engine"/>	
@@ -47,7 +47,7 @@
             <param name="video_out_path" type = "string" value = "$(find yolov5_detect)/detect/"/> 
             <param name="sort_p" type = "int" value = "2"/>
         </node>
-    </group>
+    </group> -->
 
 </launch>
 

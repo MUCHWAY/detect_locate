@@ -1,9 +1,8 @@
 <launch>
-    <!-- <group ns="uav1"> -->
-        <node pkg="camera_locate" type="locate_fly.py" name="locate_node" output="screen">
-            <param name="ID" value = "camera_108"/>
-            <rosparam ns="calibration" file="$(find camera_locate)/config/fly_camera.yaml" />
-            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
-        </node>
-    <!-- </group> -->
+    <arg name="ID" default="camera_108"/>
+    <node pkg="camera_locate" type="locate_fly.py" name="locate_node" output="screen">
+        <param name="ID" value = "$(arg ID)"/>
+        <rosparam ns="calibration" file="$(find camera_locate)/config/fly_camera.yaml" />
+        <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+    </node>
 </launch>

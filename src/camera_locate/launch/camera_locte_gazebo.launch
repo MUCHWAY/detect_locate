@@ -1,33 +1,31 @@
 <launch>
+    <arg name="calibration" default="$(find camera_locate)/config/gazebo_camera.yaml"/>
+
     <group ns="uav1">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
             <param name="ID" value = "uav1"/>	
-            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
-            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+            <rosparam ns="calibration" file="$(arg calibration)" />
         </node>
     </group>
 
     <group ns="uav2">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
             <param name="ID" value = "uav2"/>	
-            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
-            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+            <rosparam ns="calibration" file="$(arg calibration)" />
         </node>
     </group>
 
     <group ns="uav3">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
             <param name="ID" value = "uav3"/>	
-            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
-            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+            <rosparam ns="calibration" file="$(arg calibration)" />
         </node>
     </group>
 
     <group ns="uav4">
         <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
             <param name="ID" value = "uav4"/>	
-            <rosparam ns="calibration" file="$(find camera_locate)/config/gazebo_camera.yaml" />
-            <param name="data_save_path" value = "$(find camera_locate)/data/"/> 
+            <rosparam ns="calibration" file="$(arg calibration)" />
         </node>
     </group>
 </launch>

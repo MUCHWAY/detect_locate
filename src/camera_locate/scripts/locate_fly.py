@@ -57,24 +57,22 @@ class Watchdog():
         self.isFeed=True
 
 class Detect_Grtk():
-    def __init__(self,ID, camera_mtx, camera_dist, resolution):
+    def __init__(self,ID, camera_mtx, camera_dist, resolution):  
+        self.id=ID
 
         self.uav_pos = [0.00,0.00,0.00]
         self.uav_attitude = [0.00,0.00,0.00]
         self.uav_rtk_home = [32.0168627201, 118.513881163, 12.1542]
 
-        self.camera_pitch=-45
-        
-        self.new_det = [0,0]
-
-        self.id=ID
         self.timestamp=0
+        self.camera_pitch=-90
+        self.new_det = [0,0]
         self.camera_pose=[0,0,0,0,0,0]
         self.targets=[]
+        self.cam_to_world = [0.00,0.00,0.00] 
 
         def clean():
             self.cam_to_world = [0.00, 0.00 ,0.00]
-            self.cam_to_world = [0.00,0.00,0.00] 
             self.new_det = [0,0]
             self.targets=[]
 
@@ -127,7 +125,7 @@ class Detect_Grtk():
                 self.uav_attitude = self.uav_attitude_queue.datas[0][1]
 
             p = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2], self.uav_attitude[1], self.uav_attitude[0]]
-            camera_pose=self.cam_pos.getCameraPose(p, self.camera_pitch)
+            self.camera_pose=self.cam_pos.getCameraPose(p, self.camera_pitch)
             targets=[]
 
             for i in range(len(data.num)):
@@ -136,14 +134,13 @@ class Detect_Grtk():
                 detect_w = data.size_x[i]
                 detect_h = data.size_y[i]
 
-                pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,camera_pose[4])     #修正斜视偏差
+                pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,self.camera_pose[4])     #修正斜视偏差
                 pix=self.cam_pos.point2point(pix)
-                self.cam_to_world=self.cam_pos.pix2pos_2(camera_pose,self.cam_pos.mtx,pix,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
+                self.cam_to_world=self.cam_pos.pix2pos_2(self.camera_pose,self.cam_pos.mtx,pix,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
 
                 self.new_det=pix
                 targets.append({'id':int(data.num[i]),'x':self.cam_to_world[0],'y':self.cam_to_world[1]})
 
-            self.camera_pose=camera_pose
             self.targets=targets
             self.timestamp=timestamp
             self.watchdog.feed()

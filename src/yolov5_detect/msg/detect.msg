@@ -1,4 +1,4 @@
-int8[] num
+int32[] num
 string[] class_name
 int8[] conf
 int16[] box_x

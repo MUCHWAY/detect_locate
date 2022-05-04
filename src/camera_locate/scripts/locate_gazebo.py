@@ -85,10 +85,10 @@ class Detect_Grtk():
 
     def getJsonData(self):
         if len(self.targets)>0:
-            return json.dumps({'timestamp':self.timestamp,'uav':self.id,'pose':self.camera_pose,\
+            return json.dumps({'timestamp':self.timestamp,'uav':int(self.id[3:]),'pose':self.camera_pose,\
                 'targets':self.targets}).encode('utf-8')     
         else:
-            return json.dumps({'timestamp':int(round(time() * 1000)),'uav':self.id,'pose':self.camera_pose,\
+            return json.dumps({'timestamp':int(round(time() * 1000)),'uav':int(self.id[3:]),'pose':self.camera_pose,\
                 'targets':[]}).encode('utf-8')
 
     def sub(self):

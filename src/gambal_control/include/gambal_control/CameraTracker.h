@@ -1,7 +1,7 @@
 #ifndef CAMERA_TRACKER_HPP_
 #define CAMERA_TRACKER_HPP_
 
-#include "gambal_control/TcpSerial.hpp"
+#include "gambal_control/TcpSerial.h"
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>

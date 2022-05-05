@@ -4,6 +4,7 @@
 #include <cstdint>
 #include "gambal_control/ClientSocket.h"
 #include "gambal_control/SocketException.h"
+#include "time.h"
 
 #define TCP_SERIAL_IP "192.168.42.109"
 
@@ -49,7 +50,7 @@ class TcpSerial
 
 public:
 
-    TcpSerial(std::string ip=TCP_SERIAL_IP)
+    TcpSerial(std::string ip)
     {
         this->ip=ip;
         init();
@@ -74,6 +75,20 @@ public:
             std::cout << e.description() << std::endl;
         }
         return false;
+    }
+
+    void pitch_follow(const int& pitch) {
+        this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_ANGLE, CMD_PLATFORM_SET_ANGLE_PITCH, pitch);
+        usleep(1000 * 1000);
+        this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_FOLLOW_HEAD);
+        usleep(1000 * 1000);
+    }
+
+    void focus(void) {
+        this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_FOCUS, CMD_PLATFORM_SET_FOCUS_KEEP_POSITIVE);
+        usleep(2000*1000);
+        this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_FOCUS, CMD_PLATFORM_SET_FOCUS_STOP);
+        usleep(1000*100);
     }
 
 private:

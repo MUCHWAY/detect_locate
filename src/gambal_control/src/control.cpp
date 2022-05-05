@@ -21,7 +21,7 @@ int main(int argc, char** argv){
 
     Detect_cb detect_cb(img_size);
 
-    ros::Subscriber sub = nh.subscribe("/uav1/yolov5_detect_node/detect", 10, &Detect_cb::yoloCallback, &detect_cb, ros::TransportHints().tcpNoDelay());
+    ros::Subscriber sub = nh.subscribe("yolov5_detect_node/detect", 10, &Detect_cb::yoloCallback, &detect_cb, ros::TransportHints().tcpNoDelay());
 
     control.pitch_follow(-90);
 
@@ -42,7 +42,6 @@ int main(int argc, char** argv){
             ct.updateError(detect_cb.error[0],detect_cb.error[1]);
         }
         
-
         usleep(1000 * 200);
     }
 

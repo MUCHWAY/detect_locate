@@ -28,8 +28,8 @@ using namespace cv;
 
 #define USE_FP16  // set USE_INT8 or USE_FP16 or USE_FP32
 #define DEVICE 0  // GPU id
-#define NMS_THRESH 0.4
-#define CONF_THRESH 0.5
+#define NMS_THRESH 0.45
+#define CONF_THRESH 0.25
 #define BATCH_SIZE 1
 #define MAX_IMAGE_INPUT_SIZE_THRESH 3000 * 3000 // ensure it exceed the maximum size in the input images ! 
 
@@ -51,14 +51,13 @@ void doInference(IExecutionContext& context, cudaStream_t& stream, void **buffer
     cudaStreamSynchronize(stream);
 }
 
-
 int main(int argc, char** argv) {
     string node_name;
     node_name = "yolov5_detect_node";
     ros::init(argc, argv, node_name);
     ros::NodeHandle nh;
 
-    ros::Publisher detect_pub = nh.advertise<yolov5_detect::detect>(node_name + "/detect", 1000);
+    ros::Publisher detect_pub = nh.advertise<yolov5_detect::detect>(node_name + "/detect", 10);
 
     string node_num;
     ros::param::get("~node_num", node_num);
@@ -208,6 +207,7 @@ int main(int argc, char** argv) {
 
         if(final_res.size()!=0){
             for (size_t m = 0 ; m < final_res.size(); m++) {
+                cout<<final_res[m].bbox[0]<<" "<<final_res[m].bbox[1]<<' '<<final_res[m].conf<<endl;
                 dr.target_location.x = (unsigned int)final_res[m].bbox[0];
                 dr.target_location.y = (unsigned int)final_res[m].bbox[1];
                 dr.target_location.width = (int)final_res[m].bbox[2]  * sort_p;
@@ -221,10 +221,10 @@ int main(int argc, char** argv) {
         track_result = sort_track.tracking(detect_result);
         if(track_result.size() != 0) {
             for(TrackingBox t : track_result) {
-                // cout<<t.box.x<<" "<<t.box.y<<" "<<t.box.width<<' '<<t.box.height<<endl;
-                // cout<<t.confidence<<endl;
-                // cout<<t.id<<endl;
-                // cout<<t.target_name<<endl;
+                cout<<t.box.x<<" "<<t.box.y<<" "<<t.box.width<<' '<<t.box.height<<endl;
+                cout<<t.confidence<<endl;
+                cout<<t.id<<endl;
+                cout<<t.target_name<<endl;
 
                 detect_msg.num.push_back(t.id);
                 detect_msg.class_name.push_back(t.target_name);
@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
                 detect_msg.size_x.push_back((int16_t)t.box.width  / sort_p);
                 detect_msg.size_y.push_back((int16_t)t.box.height  / sort_p);
 
-                // 在图上画出跟踪结果
+                // // 在图上画出跟踪结果
                 // if(t.confidence != 0) {
                 //     cv::Rect r( (int)(t.box.x - t.box.width/2), (int)(t.box.y - t.box.height/2),(int)t.box.width,(int)t.box.height);
                 //     cv::rectangle(raw_img, r, cv::Scalar(0x27, 0xC1, 0x36), 2);
@@ -244,7 +244,6 @@ int main(int argc, char** argv) {
                 //     cv::circle(raw_img, cv::Point((int)t.box.x, (int)t.box.y), 3, cv::Scalar(0, 0, 255), - 1);
                 // }  
             }
-
         }
 
         // cv::line(raw_img, cv::Point(1920, raw_img.rows), cv::Point(1920, 0), cv::Scalar(0, 0, 255), 2, 4);
@@ -263,7 +262,7 @@ int main(int argc, char** argv) {
         detect_msg.size_y.clear(); 
 
         // cv::resize(raw_img, final, cv::Size(1920,1080));
-        // cv::imshow("Display", final);
+        // cv::imshow("Display", raw_img);
         // int k = cv::waitKey(1); 
         // static int num = 0;
         // if(k == 115)  {

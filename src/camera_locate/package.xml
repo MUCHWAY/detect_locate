@@ -84,6 +84,11 @@
   <build_export_depend>grtk</build_export_depend>
   <build_depend>grtk</build_depend>
   <exec_depend>grtk</exec_depend>
+
+
+  <build_export_depend>gambal_control</build_export_depend>
+  <build_depend>gambal_control</build_depend>
+  <exec_depend>gambal_control</exec_depend>
   
   <!-- The export tag contains other, unspecified, tags -->
   <export>

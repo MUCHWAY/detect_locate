@@ -1,12 +1,14 @@
 #ifndef CAMERA_TRACKER_HPP_
 #define CAMERA_TRACKER_HPP_
 
+#include "gambal_control/CameraAttitudeReader.hpp"
 #include "gambal_control/TcpSerial.h"
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
 
 #define CONTROL_INTERVAL 0.05
+#define TIMEOUT 2
 
 #define K_P 0.10
 #define K_I 0.01
@@ -15,12 +17,13 @@
 #define MAX_SPEED 20
 #define MIN_ERROR 10
 
+
 class CameraTracker
 {
 
 public:
 
-    CameraTracker(TcpSerial& ts):ts(ts)
+    CameraTracker(TcpSerial& ts, CameraAttitudeReader& car):ts(ts),car(car)
     {
         init();
     }
@@ -33,15 +36,7 @@ public:
 
     void setStart(bool isStart)
     {
-        if(isStart)
-        {
-            x_sum=0;
-            x_pre=0;
-            y_sum=0;
-            y_pre=0;
-            dx=0;
-            dy=0;
-        }
+        updateError(0,0,true);
         this->isStart=isStart;
     }
 
@@ -49,6 +44,7 @@ public:
     {
         this->dx=dx;
         this->dy=dy;
+        counter=0;
         if(isReset)
         {
             x_sum=0;
@@ -61,12 +57,14 @@ public:
 private:
 
     TcpSerial& ts;
+    CameraAttitudeReader& car;
     pthread_t clock_pthread;
 
     bool isEnding=false;
     bool isStart=false;
 
     int dx=0,dy=0;
+    int counter=0;
 
     long x_sum=0;
     int x_pre=0;
@@ -80,7 +78,6 @@ private:
 
     double updateX(int x_now)
     {
-
         if(x_now<MIN_ERROR && x_now>-MIN_ERROR)
         {
             x_sum=0;
@@ -128,13 +125,20 @@ private:
 
     void* run()
     {
+        int max_timeout_counter=(int)(TIMEOUT/CONTROL_INTERVAL);
         long interval=(long)(CONTROL_INTERVAL*1000000);
-        clock_t tick=clock(),tock;
-        
         while(!isEnding)
         {
             while(isStart)
             {
+                if(counter<max_timeout_counter)
+                {
+                    counter+=1;
+                }
+                else
+                {
+                    updateError(0,0,true);
+                }
                 ts.sendCommand(S_ID_PLATFORM,CMD_PLATFORM_SET_SPEED,updateX(dx),updateY(dy));
                 usleep(interval);
             }

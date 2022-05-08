@@ -18,6 +18,7 @@ from sensor_msgs.msg import *
 from yolov5_detect.msg import detect
 from camera_locate.msg import DroneState
 from grtk.msg import GNGGA
+from gambal_control.msg import camera_attitude
 
 from cam_pos import *
 
@@ -60,7 +61,7 @@ class Detect_Grtk():
     def __init__(self,ID, camera_mtx, camera_dist, resolution):  
         self.id=ID
 
-        self.uav_pos = [0.00,0.00,0.00]
+        self.uav_pos = [0.00,0.00,10]
         self.uav_attitude = [0.00,0.00,0.00]
         self.uav_rtk_home = [32.0168627201, 118.513881163, 12.1542]
 
@@ -68,6 +69,7 @@ class Detect_Grtk():
         self.camera_pitch=-90
         self.new_det = [0,0]
         self.camera_pose=[0,0,0,0,0,0]
+        self.camera_attitude = [0,0,0]
         self.targets=[]
         self.cam_to_world = [0.00,0.00,0.00] 
 
@@ -81,15 +83,16 @@ class Detect_Grtk():
         self.uav_gps_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=100) )
         self.uav_rtk_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
         self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
+        self.camera_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
 
         self.cam_pos = Camera_pos(camera_mtx, camera_dist, resolution)
 
     def getJsonData(self):
         if len(self.targets)>0:
-            return json.dumps({'timestamp':self.timestamp,'uav':int(self.id[3:]),'pose':self.camera_pose,\
+            return json.dumps({'timestamp':self.timestamp,'uav':int(self.id),'pose':self.camera_pose,\
                 'targets':self.targets}).encode('utf-8')     
         else:
-            return json.dumps({'timestamp':int(round(time() * 1000)),'uav':int(self.id[3:]),'pose':self.camera_pose,\
+            return json.dumps({'timestamp':int(round(time() * 1000)),'uav':int(self.id),'pose':self.camera_pose,\
                 'targets':[]}).encode('utf-8')
 
     def sub(self):
@@ -97,11 +100,15 @@ class Detect_Grtk():
         rospy.Subscriber("/prometheus/drone_state", DroneState , self.uav_attitude_sub)
         rospy.Subscriber("/mavros/local_position/pose", PoseStamped , self.uav_gps_sub)
         rospy.Subscriber("/uav_rtk", GNGGA , self.uav_rtk_sub)
+        rospy.Subscriber("/camera_attitude", camera_attitude , self.camera_attitude_sub)
 
         # rospy.Subscriber("/mavros/global_position/compass_hdg", Float64 , self.heading_sub)
 
     def uav_gps_sub(self,msg):
         self.uav_gps_pos_queue.push([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
+
+    def camera_attitude_sub(self,msg):
+        self.camera_attitude_queue.push([0, msg.pitch, msg.yaw])
         
     def uav_rtk_sub(self, msg):
         self.uav_rtk_pos_queue.push(self.caculate(self.uav_rtk_home, [msg.lat, msg.lon, msg.alt]))
@@ -123,9 +130,15 @@ class Detect_Grtk():
             
             if self.uav_attitude_queue.datas:
                 self.uav_attitude = self.uav_attitude_queue.datas[0][1]
+            
+            if self.camera_attitude_queue.datas:
+                self.camera_attitude = self.camera_attitude_queue.datas[0][1]
 
-            p = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2], self.uav_attitude[1], self.uav_attitude[0]]
-            self.camera_pose=self.cam_pos.getCameraPose(p, self.camera_pitch)
+            # p = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2], self.uav_attitude[1], self.uav_attitude[0]]
+            # self.camera_pose = [self.cam_pos.getCameraPose(p, self.camera_pitch)]
+
+            self.camera_pose = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2] + self.camera_attitude[2], self.camera_attitude[1], 0]
+
             targets=[]
 
             for i in range(len(data.num)):
@@ -147,6 +160,7 @@ class Detect_Grtk():
 
     def save_send(self, new_det):
         print("{0:>8} {1:>6} {2:>6}".format("det_uv:",int(new_det[0]), int(new_det[1])))
+        print("{0:>8} {1:>6} {2:>6} {3:>6}".format("cam_att:", round(self.camera_attitude[0], 2), round(self.camera_attitude[1], 2), round(self.camera_attitude[2], 2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_att:", round(self.uav_attitude[0], 2), round(self.uav_attitude[1], 2), round(self.uav_attitude[2], 2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_pos:",round(self.uav_pos[0],2),round(self.uav_pos[1],2),round(self.uav_pos[2],2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("c_to_w:",round(self.cam_to_world[0],2),round(self.cam_to_world[1],2),round(self.cam_to_world[2],2)))
@@ -167,19 +181,20 @@ class Detect_Grtk():
         
 if __name__ == "__main__":
     rospy.init_node("locate_node", anonymous=True)
+    name = rospy.get_param('~name')
     ID = rospy.get_param('~ID')
 
     calibrations_dict = rospy.get_param('~calibration')
-    camera_mtx = calibrations_dict[ID]['camera_mtx']
-    camera_dist = calibrations_dict[ID]['camera_dist']
-    resolution = calibrations_dict[ID]['resolution']
+    camera_mtx = calibrations_dict[name]['camera_mtx']
+    camera_dist = calibrations_dict[name]['camera_dist']
+    resolution = calibrations_dict[name]['resolution']
 
     detect_grtk=Detect_Grtk(ID, camera_mtx, camera_dist, resolution)
     detect_grtk.sub()
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    dest_addr_fusion = ('192.168.3.255', 5000)
+    dest_addr_fusion = ('192.168.42.255', 5000)
 
     while not rospy.is_shutdown():
         detect_grtk.save_send(detect_grtk.new_det)

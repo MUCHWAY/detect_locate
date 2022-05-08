@@ -75,13 +75,13 @@ Img_split_focus::Img_split_focus(const vector<int> &img_vec){
 
     img_size[0] = img_vec[0]; img_size[1] = img_vec[1];
 
-    split_size[0]=1024;split_size[1]=1024;
-    focus_size[0]=1024;focus_size[1]=1024;
+    split_size[0]=img_vec[2]; split_size[1]=img_vec[3];
+    focus_size[0]=img_vec[2]; focus_size[1]=img_vec[3];
 
     // x_num=(int)(img_size[0]/split_size[0])+1;
     // y_num=(int)(img_size[1]/split_size[1])+1;
-    x_num = img_vec[2];
-    y_num = img_vec[3];
+    x_num = img_vec[4];
+    y_num = img_vec[5];
 
     cout<<"x_num: "<<x_num<<endl;
     cout<<"y_num: "<<y_num<<endl;
@@ -105,7 +105,7 @@ Img_split_focus::Img_split_focus(const vector<int> &img_vec){
     // // overlap[1]=(float)(split_size[1]-split_y[1])/split_size[1];
     // cout<<"overlap_x: "<<abs(overlap[0])<<" overlap_y:"<<abs(overlap[1])<<endl;
 
-    overlap[0] = img_vec[4]; overlap[1] = img_vec[5];
+    overlap[0] = img_vec[6]; overlap[1] = img_vec[7];
     for(i=1; i<x_num; i++){
         split_x.push_back(split_x[i - 1] + split_size[0] - overlap[0]);
         cout<<split_x[i]<<endl;

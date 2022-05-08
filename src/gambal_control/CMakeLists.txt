@@ -13,8 +13,20 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   yolov5_detect
   OpenCV
+  message_generation
+  geometry_msgs
 )
 
+add_message_files(
+  FILES
+  camera_attitude.msg
+)
+
+#generate_messages必须在catkin_package前面
+generate_messages(
+ DEPENDENCIES
+ geometry_msgs
+)
 
 catkin_package(
 CATKIN_DEPENDS
@@ -23,6 +35,8 @@ CATKIN_DEPENDS
 #  CATKIN_DEPENDS roscpp rospy std_msg
 #  DEPENDS system_lib
 )
+
+
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations

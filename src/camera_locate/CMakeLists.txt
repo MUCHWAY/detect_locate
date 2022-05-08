@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   message_generation
   yolov5_detect
+  gambal_control
 )
 
 ## System dependencies are found with CMake's conventions

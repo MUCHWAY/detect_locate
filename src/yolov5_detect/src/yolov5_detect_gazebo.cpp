@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
         //     cv::imwrite(to_string(num)+".jpg", raw_img);
         //     num ++;
         // }
-        // if(write) cout<<write<<endl, outputVideo.write(img);
+        // if(write) cout<<write<<endl, outputVideo.write(final);
 
         auto end = chrono::system_clock::now();
         cout<<node_num + "_sum_time: "<<chrono::duration_cast<chrono::milliseconds>(end - start).count()<< "ms  "<<endl;

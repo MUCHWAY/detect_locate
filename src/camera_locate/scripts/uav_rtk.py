@@ -10,7 +10,7 @@ from grtk.msg import GNGGA
 if __name__ == "__main__":
   rospy.init_node('uav_rtk_pub',anonymous=True)
 
-  ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=0.2)
+  ser = serial.Serial('/dev/ttyUSB1', 115200, timeout=0.2)
 
   pub = rospy.Publisher("/uav_rtk", GNGGA, queue_size=10)
 

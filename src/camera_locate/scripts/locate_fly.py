@@ -63,8 +63,7 @@ class Detect_Grtk():
 
         self.uav_pos = [0.00,0.00,10]
         self.uav_attitude = [0.00,0.00,0.00]
-        self.uav_rtk_home = [32.0168627201, 118.513881163, 12.1542]
-
+        self.uav_rtk_home = [32.0175169842, 118.5145998564, 19.5750]
         self.timestamp=0
         self.camera_pitch=-90
         self.new_det = [0,0]
@@ -159,7 +158,7 @@ class Detect_Grtk():
             self.watchdog.feed()
 
     def save_send(self, new_det):
-        print("{0:>8} {1:>6} {2:>6}".format("det_uv:",int(new_det[0]), int(new_det[1])))
+        print("{0:>8} {1:>6} {2:>6}".format("det_uv:",int(self.new_det[0]), int(self.new_det[1])))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("cam_att:", round(self.camera_attitude[0], 2), round(self.camera_attitude[1], 2), round(self.camera_attitude[2], 2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_att:", round(self.uav_attitude[0], 2), round(self.uav_attitude[1], 2), round(self.uav_attitude[2], 2)))
         print("{0:>8} {1:>6} {2:>6} {3:>6}".format("uav_pos:",round(self.uav_pos[0],2),round(self.uav_pos[1],2),round(self.uav_pos[2],2)))

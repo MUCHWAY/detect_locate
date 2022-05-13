@@ -133,10 +133,10 @@ int main(int argc, char** argv) {
     // prepare input data cache in device memory
     CUDA_CHECK(cudaMalloc((void**)&img_device, MAX_IMAGE_INPUT_SIZE_THRESH * 3));
         
-    // cv::namedWindow("Display");
-    // cv::VideoWriter outputVideo;
-    // outputVideo.open(video_out_path + "detect.avi",  cv::VideoWriter::fourcc('M', 'P', '4', '2'), 10.0, cv::Size(1920, 1080));
-    // bool write = false;
+    cv::namedWindow("Display");
+    cv::VideoWriter outputVideo;
+    outputVideo.open(video_out_path + "detect.avi",  cv::VideoWriter::fourcc('M', 'P', '4', '2'), 10.0, cv::Size(1920, 1080));
+    bool write = false;
 
     cv::Mat raw_img ;
     cv::Mat img;
@@ -159,8 +159,10 @@ int main(int argc, char** argv) {
     {
         auto start = chrono::system_clock::now();
 
-        if(img_update.img_flag==0) break;
-        raw_img=img_update.get_img();
+        if(img_update.img_flag > 30) break;
+        raw_img = img_update.return_img;
+        img_update.img_flag ++;
+        if(img_update.img_flag > 40) img_update.img_flag = 40;
         
         memset(result_sum, 0, sizeof(result_sum));
         sum_index=1;
@@ -235,14 +237,14 @@ int main(int argc, char** argv) {
                 detect_msg.size_y.push_back((int16_t)t.box.height  / sort_p);
 
                 // // 在图上画出跟踪结果
-                // if(t.confidence != 0) {
-                //     cv::Rect r( (int)(t.box.x - t.box.width/2), (int)(t.box.y - t.box.height/2),(int)t.box.width,(int)t.box.height);
-                //     cv::rectangle(raw_img, r, cv::Scalar(0x27, 0xC1, 0x36), 2);
-                //     cv::putText(raw_img, t.target_name, cv::Point(r.x, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
-                //     cv::putText(raw_img, std::to_string(t.confidence).substr(0,4), cv::Point(r.x+40, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
-                //     cv::putText(raw_img, std::to_string(t.id), cv::Point(r.x+100, r.y), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
-                //     cv::circle(raw_img, cv::Point((int)t.box.x, (int)t.box.y), 3, cv::Scalar(0, 0, 255), - 1);
-                // }  
+                if(t.confidence != 0) {
+                    cv::Rect r( (int)(t.box.x - t.box.width/2), (int)(t.box.y - t.box.height/2),(int)t.box.width,(int)t.box.height);
+                    cv::rectangle(raw_img, r, cv::Scalar(0x27, 0xC1, 0x36), 2);
+                    cv::putText(raw_img, t.target_name, cv::Point(r.x, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
+                    cv::putText(raw_img, std::to_string(t.confidence).substr(0,4), cv::Point(r.x+40, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
+                    cv::putText(raw_img, std::to_string(t.id), cv::Point(r.x+100, r.y), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255), 2);
+                    cv::circle(raw_img, cv::Point((int)t.box.x, (int)t.box.y), 3, cv::Scalar(0, 0, 255), - 1);
+                }  
             }
         }
 
@@ -261,24 +263,24 @@ int main(int argc, char** argv) {
         detect_msg.size_x.clear();
         detect_msg.size_y.clear(); 
 
-        // cv::resize(raw_img, final, cv::Size(1920,1080));
-        // cv::imshow("Display", raw_img);
-        // int k = cv::waitKey(1); 
-        // static int num = 0;
-        // if(k == 115)  {
-        //     write = true;
-        //     cv::imwrite(to_string(num)+".jpg", raw_img);
-        //     num ++;
-        // }
-        // if(write) cout<<write<<endl, outputVideo.write(img);
+        cv::resize(raw_img, final, cv::Size(960,540));
+        cv::imshow("Display", final);
+        int k = cv::waitKey(1); 
+        static int num = 0;
+        if(k == 115)  {
+            write = true;
+            cv::imwrite(to_string(num)+".jpg", final);
+            num ++;
+        }
+        if(write) cout<<write<<endl, outputVideo.write(final);
 
         auto end = chrono::system_clock::now();
         cout<<node_num + "_sum_time: "<<chrono::duration_cast<chrono::milliseconds>(end - start).count()<< "ms  "<<endl;
         cout<<"--------------------------------"<<endl;
     }
 
-    // cv::destroyWindow("Display");
-    // outputVideo.release();
+    cv::destroyWindow("Display");
+    outputVideo.release();
 
     // Release stream and buffers
     cudaStreamDestroy(stream);

@@ -80,8 +80,8 @@ public:
     void pitch_follow(const int& pitch) {
         this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_ANGLE, CMD_PLATFORM_SET_ANGLE_PITCH, pitch);//
         usleep(1000 * 1000);
-        // this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_FOLLOW_HEAD);//跟随机头
-        // usleep(1000 * 1000);
+        //this->sendCommand(S_ID_PLATFORM, CMD_PLATFORM_FOLLOW_HEAD);//跟随机头
+        //usleep(1000 * 1000);
     }
 
     void focus(void) {

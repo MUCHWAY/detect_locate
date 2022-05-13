@@ -1,0 +1,11 @@
+<launch>
+    <arg name="gambal_IP" default="192.168.42.109"/>
+    <arg name="track" default="false"/>
+
+    <node pkg="gambal_control" type="gambal_control" name="gambal_control_node" output="screen">
+        <param name="gambal_IP" type = "string" value = "$(arg gambal_IP)"/>
+        <param name="track" type = "bool" value = "$(arg track)"/>
+
+        <rosparam param="img_size">[1920, 1080]</rosparam>
+    </node>
+</launch>

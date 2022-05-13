@@ -49,18 +49,13 @@ class Img_update{
     public:
         cv::Mat img;
         cv::Mat return_img;
-        // cv::Mat r_img;
         int img_flag;
-        cv::Mat mtx;
-        cv::Mat newcameramtx;
-        cv::Mat dist;
         int width;
         int height;
         
         Img_update(std::string path);
         void update();
         cv::Mat get_img();
-        void undistortPoints(std::vector<cv::Point2f>& points);
 };
 
 class Img_split_focus{

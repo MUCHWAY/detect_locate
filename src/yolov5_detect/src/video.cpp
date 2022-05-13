@@ -12,9 +12,6 @@ void Ros_image::img_callback(const sensor_msgs::ImageConstPtr &msg)
   {
     img = cv_bridge::toCvShare(msg, "bgr8")->image;
     update = 0;
-    if(update > 30) update = 30;
-    // cv::imshow("view", img);
-    // cv::waitKey(1);
   }
   catch (cv_bridge::Exception& e)
   {
@@ -32,10 +29,6 @@ Img_update::Img_update(std::string path){
     img_flag=1;
     width = 0;
     height = 0;
-
-    mtx=(cv::Mat_<double>(3, 3)<<MTX_COEF);
-    newcameramtx=(cv::Mat_<double>(3, 3)<<NEW_CAMERA_MTX_COEF);
-    dist=(cv::Mat_<double>(1, 5)<<DIST_COEF);
 }
 
 void Img_update::update(){
@@ -52,23 +45,14 @@ void Img_update::update(){
 
     while(ros::ok()){
         m.lock(); // 上锁
-        if(!capture.read(img)) {
-            img_flag=0;
-            break;
-        }else img_flag=1;
+        if(capture.read(img)) img_flag=0;
         return_img=img.clone();
-        // img=cv::imread("../detect/test_image/DJI_0708.jpg");
         m.unlock(); // 解锁
     }
 }
 
 cv::Mat Img_update::get_img(){
     return return_img;
-}
-
-void Img_update::undistortPoints(std::vector<cv::Point2f>& points)
-{
-    cv::undistortPoints(points, points, mtx, dist, cv::Mat(), newcameramtx);
 }
 
 Img_split_focus::Img_split_focus(const vector<int> &img_vec){

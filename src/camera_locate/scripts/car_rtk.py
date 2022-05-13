@@ -39,7 +39,7 @@ class Client:
 
         self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.dest_addr = ('192.168.3.255', 6000)
+        self.dest_addr = ('192.168.42.255', 6000)
 
         t = threading.Thread(target = self.receive)
         t.daemon = True
@@ -48,7 +48,8 @@ class Client:
     def receive(self):
         msg=GNGGA()
         pub = rospy.Publisher("/car_rtk", GNGGA, queue_size=10)
-        start = [ 32.0168626586, 118.513880902, 12.1566]
+
+        start = [32.0175176968, 118.51459935909999, 19.6055]
 
         while True:
             try:
@@ -60,12 +61,15 @@ class Client:
                         print('close')
                         break
                     string=data.decode('utf-8')
-                    print(string)
+                    # print(string)
 
                     data_list = string.split(',')
-                    print(data_list)
 
-                    car_pos = caculate(start, [float(data_list[2])/100, float(data_list[4])/100, float(data_list[9])])
+                    end = [ float(data_list[2])/100, float(data_list[4])/100, float(data_list[9])]
+                    print(end)
+                    #  car_pos = caculate(start, [float(data_list[2])/100, float(data_list[4])/100, float(data_list[9])])
+                    car_pos = caculate(start, end)
+      
                     data = json.dumps([{'x':car_pos[0],'y':car_pos[1]}]).encode('utf-8')
                     self.udp_socket.sendto(data, self.dest_addr)
 

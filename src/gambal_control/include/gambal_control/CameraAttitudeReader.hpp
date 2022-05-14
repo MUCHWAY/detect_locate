@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "time.h"
 
-#define CAN_USB_DEV "/dev/ttyUSB0"
+#define CAN_USB_DEV "/dev/can"
 #define CAN_MSG_LEN 27
 
 class CameraAttitudeReader

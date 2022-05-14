@@ -15,17 +15,5 @@
         </node>
     </group>
 
-    <!-- <group ns="uav3">
-        <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
-            <param name="ID" value = "uav3"/>	
-            <rosparam ns="calibration" file="$(arg calibration)" />
-        </node>
-    </group>
 
-    <group ns="uav4">
-        <node pkg="camera_locate" type="locate_gazebo.py" name="locate_node" output="screen">
-            <param name="ID" value = "uav4"/>	
-            <rosparam ns="calibration" file="$(arg calibration)" />
-        </node>
-    </group> -->
 </launch>

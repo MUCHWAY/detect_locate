@@ -21,7 +21,7 @@ public:
 
 Detect_cb::Detect_cb(vector<int>& img_size)
 {
-    this->update = 0;
+    this->update = 100;
     this->error = {0, 0};
     this->img_size = img_size;
 }

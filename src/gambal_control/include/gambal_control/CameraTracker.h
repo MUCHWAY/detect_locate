@@ -54,6 +54,19 @@ public:
         }
     }
 
+    void recoverCameraState()
+    {
+        usleep(1000 * 200);
+        ts.sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_ANGLE, CMD_PLATFORM_SET_ANGLE_PITCH, -90.0);
+        while(abs(car.pitch+90)>2)
+        {
+            usleep(1000 * 100);
+            std::cout<<abs(car.pitch+90)<<std::endl;
+        }
+        ts.sendCommand(S_ID_PLATFORM, CMD_PLATFORM_FOLLOW_HEAD);//跟随机头
+            usleep(1000 * 1000);
+    }
+
 private:
 
     TcpSerial& ts;
@@ -62,6 +75,7 @@ private:
 
     bool isEnding=false;
     bool isStart=false;
+    bool isRecovered=true;
 
     int dx=0,dy=0;
     int counter=0;
@@ -131,6 +145,9 @@ private:
         {
             while(isStart)
             {
+                if(isRecovered)
+                    isRecovered=false;
+
                 if(counter<max_timeout_counter)
                 {
                     counter+=1;
@@ -140,7 +157,13 @@ private:
                     updateError(0,0,true);
                 }
                 ts.sendCommand(S_ID_PLATFORM,CMD_PLATFORM_SET_SPEED,updateX(dx),updateY(dy));
+                std::cout<<"tracking"<<std::endl;
                 usleep(interval);
+            }
+            if(!isRecovered)
+            {
+                isRecovered=true;
+                recoverCameraState();
             }
             usleep(1000);
         }

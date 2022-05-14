@@ -6,7 +6,7 @@ import socket
 from nav_msgs.msg import *
 import json
 
-ugv_num = 1
+ugv_num = 4
 ugv_pos = []
 for i in range(ugv_num):
     ugv_pos.append([0,0,0])
@@ -17,7 +17,7 @@ def ugv_pos_sub(msg, i):
 if __name__ == "__main__":
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    dest_addr = ('192.168.42.255', 6000)
+    dest_addr = ('192.168.3.255', 6000)
 
     rospy.init_node('ugv_pos_node', anonymous= True)
 

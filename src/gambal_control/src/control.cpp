@@ -30,10 +30,12 @@ int main(int argc, char** argv){
     ros::Publisher attitude_pub = nh.advertise<gambal_control::camera_attitude>("/camera_attitude", 10);
     ros::Subscriber sub = nh.subscribe("yolov5_detect_node/detect", 10, &Detect_cb::yoloCallback, &detect_cb, ros::TransportHints().tcpNoDelay());
 
-    control.pitch_follow(-90);
+    bool isTracking=false;
+
+    control.pitch_follow(-90.0);
     control.focus();
 
-    ct.setStart(track);  //开始追踪
+    ct.setStart(false);
 
     gambal_control::camera_attitude atti;
 
@@ -49,9 +51,24 @@ int main(int argc, char** argv){
         detect_cb.update ++;
         if(detect_cb.update > 100) detect_cb.update = 100;
 
-        if(detect_cb.update > 10)
+        if(detect_cb.update > 40) {
+            if(track && isTracking)
+            {
+                cout<<"stop"<<endl;
+                isTracking=false;
+                ct.setStart(false);
+            }
             ct.updateError(0,0,true);
+        }
         else {
+            if(track && !isTracking)
+            {
+                cout<<"start"<<endl;
+                isTracking=true;
+                control.sendCommand(S_ID_PLATFORM, CMD_PLATFORM_SET_ANGLE, CMD_PLATFORM_SET_ANGLE_PITCH, atti.pitch);
+                usleep(1000 * 100);
+                ct.setStart(true);
+            }
             // cout<<detect_cb.error[0]<<' '<<detect_cb.error[1]<<endl;
             ct.updateError(detect_cb.error[0],detect_cb.error[1]);
         }

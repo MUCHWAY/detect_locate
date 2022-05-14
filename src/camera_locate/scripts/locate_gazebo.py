@@ -92,9 +92,9 @@ class Detect_Grtk():
                 'targets':[]}).encode('utf-8')
 
     def sub(self):
-        rospy.Subscriber('/'+self.id + "/yolov5_detect_node/detect", detect , self.yolov5_sub)
-        rospy.Subscriber('/'+self.id + "/prometheus/drone_state", DroneState , self.uav_attitude_sub)
-        rospy.Subscriber('/'+self.id + "/mavros/local_position/pose", PoseStamped , self.local_pose_sub)
+        rospy.Subscriber("yolov5_detect_node/detect", detect , self.yolov5_sub)
+        rospy.Subscriber("prometheus/drone_state", DroneState , self.uav_attitude_sub)
+        rospy.Subscriber("mavros/local_position/pose", PoseStamped , self.local_pose_sub)
 
     def local_pose_sub(self,msg):
         # self.uav_pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
@@ -105,11 +105,12 @@ class Detect_Grtk():
         self.uav_attitude_queue.push([msg.attitude[0]*57.3, msg.attitude[1]*57.3, ((-1 * msg.attitude[2]*57.3) + 90 + 360) % 360])
 
     def yolov5_sub(self,data):
-        if data:
+        if data.num:
             timestamp=int(round(time() * 1000))
 
             if self.uav_pos_queue.datas:
                 self.uav_pos = self.uav_pos_queue.datas[0][1]
+
             if self.uav_attitude_queue.datas:
                 self.uav_attitude = self.uav_attitude_queue.datas[0][1]
 
@@ -129,7 +130,7 @@ class Detect_Grtk():
 
                 pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,self.camera_pose[4])     #修正斜视偏差
                 pix=self.cam_pos.point2point(pix)
-                self.cam_to_world=self.cam_pos.pix2pos_2(self.camera_pose,self.cam_pos.mtx,pix,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
+                self.cam_to_world=self.cam_pos.pix2pos_2(self.camera_pose,self.cam_pos.newcameramtx,pix,inv_inmtx=self.cam_pos.inv_newcameramtx)  #解算目标坐标
 
                 self.new_det=pix
                 targets.append({'id':int(data.num[i]),'x':self.cam_to_world[0],'y':self.cam_to_world[1]})

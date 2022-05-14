@@ -18,6 +18,7 @@ from sensor_msgs.msg import *
 from yolov5_detect.msg import detect
 from camera_locate.msg import DroneState
 from grtk.msg import GNGGA
+from grtk.msg import GPHDT
 from gambal_control.msg import camera_attitude
 
 from cam_pos import *
@@ -63,7 +64,7 @@ class Detect_Grtk():
 
         self.uav_pos = [0.00,0.00,10]
         self.uav_attitude = [0.00,0.00,0.00]
-        self.uav_rtk_home = [32.0175169842, 118.5145998564, 19.5750]
+        self.uav_rtk_home = [32.0174856861, 118.5146015155, 16.5878]
         self.timestamp=0
         self.camera_pitch=-90
         self.new_det = [0,0]
@@ -79,10 +80,11 @@ class Detect_Grtk():
 
         self.watchdog = Watchdog(callback=clean)
 
-        self.uav_gps_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=100) )
-        self.uav_rtk_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
-        self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
-        self.camera_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=200) )
+        self.uav_gps_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=700) )
+        self.uav_rtk_heading_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=700) )
+        self.uav_rtk_pos_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=700) )
+        self.uav_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=700) )
+        self.camera_attitude_queue = DelayedQueue( delay=datetime.timedelta(seconds=0, milliseconds=700) )
 
         self.cam_pos = Camera_pos(camera_mtx, camera_dist, resolution)
 
@@ -99,8 +101,8 @@ class Detect_Grtk():
         rospy.Subscriber("/prometheus/drone_state", DroneState , self.uav_attitude_sub)
         rospy.Subscriber("/mavros/local_position/pose", PoseStamped , self.uav_gps_sub)
         rospy.Subscriber("/uav_rtk", GNGGA , self.uav_rtk_sub)
+        rospy.Subscriber("/uav_rtk_heading", GPHDT , self.uav_rtk_heading_sub)
         rospy.Subscriber("/camera_attitude", camera_attitude , self.camera_attitude_sub)
-
         # rospy.Subscriber("/mavros/global_position/compass_hdg", Float64 , self.heading_sub)
 
     def uav_gps_sub(self,msg):
@@ -112,13 +114,16 @@ class Detect_Grtk():
     def uav_rtk_sub(self, msg):
         self.uav_rtk_pos_queue.push(self.caculate(self.uav_rtk_home, [msg.lat, msg.lon, msg.alt]))
     
+    def uav_rtk_heading_sub(self, msg):
+        self.uav_rtk_heading_queue.push(msg.heading)
+    
     def uav_attitude_sub(self,msg):
-        # print(msg)
         # self.uav_attitude=[msg.attitude[0]*57.3, msg.attitude[1]*57.3, ((-1 * msg.attitude[2]*57.3) + 90 + 360) % 360]
         self.uav_attitude_queue.push([msg.attitude[0]*57.3, msg.attitude[1]*57.3, ((-1 * msg.attitude[2]*57.3) + 90 + 360) % 360])
 
     def yolov5_sub(self,data):
-        if data:
+
+        if data.num:
             timestamp=int(round(time() * 1000))
 
             # if self.uav_gps_pos_queue.datas:
@@ -133,8 +138,16 @@ class Detect_Grtk():
             if self.camera_attitude_queue.datas:
                 self.camera_attitude = self.camera_attitude_queue.datas[0][1]
 
+            if self.uav_rtk_heading_queue.datas:
+                # print("rtk_heading: ", self.uav_rtk_heading_queue.datas[0][1])
+                self.uav_attitude[2] = self.uav_rtk_heading_queue.datas[0][1]
+                
             # p = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2], self.uav_attitude[1], self.uav_attitude[0]]
             # self.camera_pose = [self.cam_pos.getCameraPose(p, self.camera_pitch)]
+
+
+            self.uav_pos = [0,0,0.81] 
+            self.uav_attitude = [0,0,0]
 
             self.camera_pose = [self.uav_pos[0], self.uav_pos[1], self.uav_pos[2], self.uav_attitude[2] + self.camera_attitude[2], self.camera_attitude[1], 0]
 
@@ -148,7 +161,7 @@ class Detect_Grtk():
 
                 pix=self.cam_pos.pf.getFixedPix(detect_x,detect_y,detect_w,detect_h,self.camera_pose[4])     #修正斜视偏差
                 pix=self.cam_pos.point2point(pix)
-                self.cam_to_world=self.cam_pos.pix2pos_2(self.camera_pose,self.cam_pos.mtx,pix,inv_inmtx=self.cam_pos.inv_mtx)  #解算目标坐标
+                self.cam_to_world=self.cam_pos.pix2pos_2(self.camera_pose, self.cam_pos.newcameramtx, pix, inv_inmtx=self.cam_pos.inv_newcameramtx)  #解算目标坐标
 
                 self.new_det=pix
                 targets.append({'id':int(data.num[i]),'x':self.cam_to_world[0],'y':self.cam_to_world[1]})
@@ -193,7 +206,7 @@ if __name__ == "__main__":
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    dest_addr_fusion = ('192.168.42.255', 5000)
+    dest_addr_fusion = ('192.168.3.255', 5000)
 
     while not rospy.is_shutdown():
         detect_grtk.save_send(detect_grtk.new_det)

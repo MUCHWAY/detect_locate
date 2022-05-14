@@ -49,7 +49,7 @@ class Client:
         msg=GNGGA()
         pub = rospy.Publisher("/car_rtk", GNGGA, queue_size=10)
 
-        start = [32.0175176968, 118.51459935909999, 19.6055]
+        start = [32.0174843916, 118.5146050334, 18.1051]
 
         while True:
             try:
@@ -72,6 +72,8 @@ class Client:
       
                     data = json.dumps([{'x':car_pos[0],'y':car_pos[1]}]).encode('utf-8')
                     self.udp_socket.sendto(data, self.dest_addr)
+
+                    print(data)
 
                     msg.utc = float(data_list[1])
                     msg.lat = float(data_list[2])/100

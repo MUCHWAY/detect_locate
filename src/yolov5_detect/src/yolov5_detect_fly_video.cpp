@@ -75,8 +75,8 @@ int main(int argc, char** argv) {
         img_update.img_flag ++;
         if(img_update.img_flag > 40) img_update.img_flag = 40;
         
-        // cv::resize(raw_img, final, cv::Size(960,540));
-        cv::imshow("Display", raw_img);
+        cv::resize(raw_img, final, cv::Size(960,540));
+        cv::imshow("Display", final);
         int k = cv::waitKey(1); 
         static int num = 0;
         if(k == 115)  {

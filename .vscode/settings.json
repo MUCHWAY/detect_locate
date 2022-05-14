@@ -61,7 +61,9 @@
         "typeinfo": "cpp",
         "unordered_set": "cpp",
         "hash_map": "cpp",
-        "hash_set": "cpp"
+        "hash_set": "cpp",
+        "core": "cpp",
+        "eigen": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/opt/ros/melodic/lib/python2.7/dist-packages",

@@ -1,11 +1,17 @@
 <launch>
     <arg name="gambal_IP" default="192.168.42.109"/>
     <arg name="track" default="false"/>
+    <arg name="initial_pitch" default="-90.0"/>
+    <arg name="gimbal_topic_orientation" default="/mavros/mount_control/orientation"/>
+    <arg name="gimbal_topic_command" default="/mavros/mount_control/command"/>
 
-    <node pkg="gambal_control" type="gambal_control" name="gambal_control_node" output="screen">
+    <node pkg="gambal_control" type="gambal_control_gazebo" name="gambal_control_gazebo_node" output="screen">
         <param name="gambal_IP" type = "string" value = "$(arg gambal_IP)"/>
         <param name="track" type = "bool" value = "$(arg track)"/>
-
+        <param name="initial_pitch" type = "double" value = "$(arg initial_pitch)"/>
+        <param name="gimbal_topic_orientation" type = "string" value = "$(arg gimbal_topic_orientation)"/> 
+        <param name="gimbal_topic_command" type = "string" value = "$(arg gimbal_topic_command)"/> 
+        
         <rosparam param="img_size">[1920, 1080]</rosparam>
     </node>
 </launch>

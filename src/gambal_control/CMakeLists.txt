@@ -54,3 +54,8 @@ add_executable(gambal_control  src/control.cpp src/ClientSocket.cpp src/Socket.c
 add_dependencies(gambal_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(gambal_control ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
+add_executable(gambal_control_gazebo  src/control_gazebo.cpp)
+add_dependencies(gambal_control_gazebo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gambal_control_gazebo ${OpenCV_LIBS} ${catkin_LIBRARIES})
+
+

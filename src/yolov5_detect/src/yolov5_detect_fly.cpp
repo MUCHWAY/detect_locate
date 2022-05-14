@@ -223,6 +223,8 @@ int main(int argc, char** argv) {
         track_result = sort_track.tracking(detect_result);
         if(track_result.size() != 0) {
             for(TrackingBox t : track_result) {
+                t.box.width/=sort_p;
+                t.box.height/=sort_p;
                 cout<<t.box.x<<" "<<t.box.y<<" "<<t.box.width<<' '<<t.box.height<<endl;
                 cout<<t.confidence<<endl;
                 cout<<t.id<<endl;
@@ -233,8 +235,8 @@ int main(int argc, char** argv) {
                 detect_msg.conf.push_back((int8_t)(t.confidence*100));
                 detect_msg.box_x.push_back((int16_t)t.box.x); 
                 detect_msg.box_y.push_back((int16_t)t.box.y);
-                detect_msg.size_x.push_back((int16_t)t.box.width  / sort_p);
-                detect_msg.size_y.push_back((int16_t)t.box.height  / sort_p);
+                detect_msg.size_x.push_back((int16_t)t.box.width);
+                detect_msg.size_y.push_back((int16_t)t.box.height);
 
                 // // 在图上画出跟踪结果
                 if(t.confidence != 0) {
@@ -248,8 +250,8 @@ int main(int argc, char** argv) {
             }
         }
 
-        // cv::line(raw_img, cv::Point(1920, raw_img.rows), cv::Point(1920, 0), cv::Scalar(0, 0, 255), 2, 4);
-        // cv::line(raw_img, cv::Point(raw_img.cols,1080), cv::Point(0,1080), cv::Scalar(0, 0, 255), 2, 4);
+        cv::line(raw_img, cv::Point(raw_img.cols/2, raw_img.rows), cv::Point(raw_img.cols/2, 0), cv::Scalar(0, 0, 255), 2, 4);
+        cv::line(raw_img, cv::Point(raw_img.cols,raw_img.rows/2), cv::Point(0,raw_img.rows/2), cv::Scalar(0, 0, 255), 2, 4);
 
         detect_pub.publish(detect_msg);
         detect_result.clear();

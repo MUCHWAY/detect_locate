@@ -9,7 +9,7 @@ class pixFixer:
     INDEX_LUT:list
     ANGLE_LUT:list
 
-    def __init__(self,w=4.4,d=2.8,h=1.5,o=0.4,img_height=1024,FOV_v=60):
+    def __init__(self,w=4.4,d=2.8,h=1.5,o=0.1,img_height=1024,FOV_v=60):
         self.RATIO_LUT=[]
         self.INDEX_LUT=[]
         self.ANGLE_LUT=[]
@@ -68,11 +68,12 @@ class Camera_pos:
         self.FOV_v = 2 * np.arctan(self.mtx[1,2]/self.mtx[1,1])*57.3
         self.size = resolution
 
-        self.inv_mtx=np.linalg.inv(self.mtx)
-
-        self.newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (1024, 1024), 1, (1024, 1024))  # 自由比例参数
+        self.newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (resolution[0], resolution[1]), 1, (resolution[0], resolution[1]))  # 自由比例参数
         self.img_x_center=self.newcameramtx[0][2]
         self.img_y_center=self.newcameramtx[1][2]
+
+        self.inv_mtx=np.linalg.inv(self.mtx)
+        self.inv_newcameramtx=np.linalg.inv(self.newcameramtx)
         
         self.camera_pos = [0.00 , 0.00 ,0.00]
         self.line_distance=0

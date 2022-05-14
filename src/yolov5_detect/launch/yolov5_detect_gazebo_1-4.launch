@@ -11,7 +11,7 @@
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
             <param name="video_name" type = "string" value = "$(arg video_name)"/> 
             <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
-            <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
+            <rosparam param="img_list">[1920, 1080,1024, 1024 , 2, 1, 128, 50]</rosparam>
             <param name="video_out_path" type = "string" value = "$(arg video_out_path)"/> 
             <param name="sort_p" type = "int" value = "$(arg sort_p)"/> 
         </node>
@@ -23,7 +23,7 @@
             <param name="engine_name" type = "string" value = "$(arg engine_name)"/>	
             <param name="video_name" type = "string" value = "$(arg video_name)"/> 
             <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
-            <rosparam param="img_list">[1920, 1080, 2, 1, 128, 50]</rosparam>
+            <rosparam param="img_list">[1920, 1080,1024, 1024 , 2, 1, 128, 50]</rosparam>
             <param name="video_out_path" type = "string" value = "$(arg video_out_path)"/> 
             <param name="sort_p" type = "int" value = "$(arg sort_p)"/> 
         </node>

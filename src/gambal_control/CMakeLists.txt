@@ -7,7 +7,9 @@ project(gambal_control)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-set(OpenCV_DIR /usr/lib/aarch64-linux-gnu/cmake/opencv4/)
+# set(OpenCV_DIR /usr/lib/aarch64-linux-gnu/cmake/opencv4/)
+set(OpenCV_DIR /usr/local/lib/cmake/opencv4/)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy

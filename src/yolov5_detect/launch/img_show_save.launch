@@ -1,0 +1,19 @@
+<launch>
+    <arg name="video_name" default="$(find yolov5_detect)/detect/test_vedio/DJI_0706_follow.mp4"/>
+    <!-- <arg name="video_name" default="rtsp://admin:admin@192.168.42.108:554/cam/realmonitor?channel=1&amp;subtype=0"/> -->
+    <arg name="video_out_path" default="$(find yolov5_detect)/detect/video/"/>
+    <arg name="img_save_path" default="$(find yolov5_detect)/detect/img/"/>
+    <arg name="img_topic" default="/drone_4/camera_down/image_raw"/>
+    <!-- <arg name="start_indx" default="/drone_2/camera_down/image_raw"/> -->
+
+
+    <node pkg="yolov5_detect" type="img_show_save" name="img_show_save_node" output="screen">
+        <param name="video_name" type = "string" value = "$(arg video_name)"/> 
+        <param name="img_topic" type = "string" value = "$(arg img_topic)"/> 
+        <rosparam param="img_list">[4096, 2160, 4, 2, 90, 50]</rosparam>
+        <param name="video_out_path" type = "string" value = "$(arg video_out_path)"/> 
+        <param name="img_save_path" type = "string" value = "$(arg img_save_path)"/> 
+    </node>
+</launch>
+
+

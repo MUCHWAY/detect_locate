@@ -8,7 +8,8 @@ project(yolov5_detect)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-set(OpenCV_DIR /usr/lib/aarch64-linux-gnu/cmake/opencv4/)
+# set(OpenCV_DIR /usr/lib/aarch64-linux-gnu/cmake/opencv4/)
+set(OpenCV_DIR /usr/local/lib/cmake/opencv4/)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
@@ -78,8 +79,12 @@ endif(WIN32)
 
 # include and link dirs of cuda and tensorrt, you need adapt them if yours are different
 # cuda
-include_directories(/usr/local/cuda/include)
-link_directories(/usr/local/cuda/lib64)
+# include_directories(/usr/local/cuda/include)
+# link_directories(/usr/local/cuda/lib64)
+
+include_directories("/home/lenovo/Develop/Tool/TensorRT-8.4.0.6.Linux.x86_64-gnu.cuda-11.6.cudnn8.3/TensorRT-8.4.0.6/include")
+link_directories("/home/lenovo/Develop/Tool/TensorRT-8.4.0.6.Linux.x86_64-gnu.cuda-11.6.cudnn8.3/TensorRT-8.4.0.6/lib")
+
 
 # tensorrt
 include_directories(/usr/include/x86_64-linux-gnu/)
@@ -94,6 +99,7 @@ target_link_libraries(myplugins nvinfer cudart)
 
 cuda_add_executable(yolov5_detect_gazebo src/calibrator.cpp src/yolov5_detect_gazebo.cpp src/preprocess.cu src/video.cpp)
 cuda_add_executable(yolov5_detect_fly src/calibrator.cpp src/yolov5_detect_fly.cpp src/preprocess.cu src/video.cpp)
+add_executable(img_show_save  src/img_show_save.cpp src/video.cpp)
 
 add_library(sort src/sort.cpp src/Hungarian.cpp src/KalmanTracker.cpp)
 target_link_libraries(sort ${OpenCV_LIBS})
@@ -111,6 +117,9 @@ target_link_libraries(yolov5_detect_fly myplugins)
 target_link_libraries(yolov5_detect_fly ${OpenCV_LIBS})
 target_link_libraries(yolov5_detect_fly ${catkin_LIBRARIES})
 target_link_libraries(yolov5_detect_fly sort)
+
+add_dependencies(img_show_save ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(img_show_save ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
 if(UNIX)
 add_definitions(-O2 -pthread)

@@ -26,7 +26,7 @@ void Ros_image::img_update() {
 
 Img_update::Img_update(std::string path){
     img_path=path;
-    img_flag=30;
+    img_flag=21;
     width = 0;
     height = 0;
 }
@@ -46,7 +46,7 @@ void Img_update::update(){
     while(ros::ok()){
         m.lock(); // 上锁
         if(capture.read(img)) img_flag=0;
-        return_img=img.clone();
+        // return_img=img.clone();
         m.unlock(); // 解锁
     }
 }

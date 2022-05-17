@@ -159,13 +159,14 @@ int main(int argc, char** argv) {
     {
         auto start = chrono::system_clock::now();
 
-        if(img_update.img_flag > 30) break;
-        img_update.return_img.copyTo(raw_img);
+        raw_img = img_update.img.clone();
         img_update.img_flag ++;
-        if(img_update.img_flag > 40) img_update.img_flag = 40;
-        cout<<raw_img.size()<<endl;
-        if(raw_img.cols==0 || raw_img.rows==0)
+        if(img_update.img_flag > 20) img_update.img_flag = 21;
+        if(img_update.img_flag > 20){
+            usleep(1000*50);
             continue;
+        }
+
         
         memset(result_sum, 0, sizeof(result_sum));
         sum_index=1;

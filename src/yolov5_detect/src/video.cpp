@@ -26,7 +26,7 @@ void Ros_image::img_update() {
 
 Img_update::Img_update(std::string path){
     img_path=path;
-    img_flag=1;
+    img_flag=30;
     width = 0;
     height = 0;
 }

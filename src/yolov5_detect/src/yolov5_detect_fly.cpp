@@ -28,8 +28,8 @@ using namespace cv;
 
 #define USE_FP16  // set USE_INT8 or USE_FP16 or USE_FP32
 #define DEVICE 0  // GPU id
-#define NMS_THRESH 0.45
-#define CONF_THRESH 0.25
+#define NMS_THRESH 0.2
+#define CONF_THRESH 0.7
 #define BATCH_SIZE 1
 #define MAX_IMAGE_INPUT_SIZE_THRESH 3000 * 3000 // ensure it exceed the maximum size in the input images ! 
 
@@ -160,15 +160,19 @@ int main(int argc, char** argv) {
         auto start = chrono::system_clock::now();
 
         if(img_update.img_flag > 30) break;
-        raw_img = img_update.return_img;
+        img_update.return_img.copyTo(raw_img);
         img_update.img_flag ++;
         if(img_update.img_flag > 40) img_update.img_flag = 40;
+        cout<<raw_img.size()<<endl;
+        if(raw_img.cols==0 || raw_img.rows==0)
+            continue;
         
         memset(result_sum, 0, sizeof(result_sum));
         sum_index=1;
         for(int i=0;i<split_focus.y_num;i++){
             for(int j=0;j<split_focus.x_num;j++){
                 cv::Rect rect( split_focus.split_x[j], split_focus.split_y[i], split_focus.split_size[0], split_focus.split_size[1] );
+
                 img = raw_img(rect).clone(); //裁切小图
 
                 float* buffer_idx = (float*)buffers[inputIndex];

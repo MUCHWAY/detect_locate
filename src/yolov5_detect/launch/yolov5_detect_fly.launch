@@ -1,5 +1,5 @@
 <launch>
-    <arg name="engine_name" default="$(find yolov5_detect)/weights/bluecar_1024_n_nx.engine"/>
+    <arg name="engine_name" default="$(find yolov5_detect)/weights/bluecar_1024_n_2070.engine"/>
     <!-- <arg name="video_name" default="$(find yolov5_detect)/detect/test_vedio/1.jpeg"/> -->
     <arg name="video_name" default="rtsp://admin:admin@192.168.42.108:554/cam/realmonitor?channel=1&amp;subtype=2"/>
     <arg name="video_out_path" default="$(find yolov5_detect)/detect/"/>
